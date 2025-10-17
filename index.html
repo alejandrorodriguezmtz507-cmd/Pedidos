@@ -1,4 +1,3 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -73,25 +72,16 @@ button:hover {
 .logo-container img {
   width: 250px;
   border-radius: 10px;
-}
-.whatsapp-btn {
-  background-color: #25D366;
-  color: white;
-  font-weight: bold;
-}
-.whatsapp-btn:hover {
-  background-color: #1ebe5b;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
 }
 </style>
 </head>
 <body>
 
+<!-- 🔹 LOGO desde Google Drive -->
 <div class="logo-container">
-
-
-
-  
-  <img src="https://drive.google.com/uc?export=view&id=1MCoGP1Nk9ghRwKfmKo9HyZ2Nc8Sards0 " alt="Coffe Dreams">
+  <img src="https://drive.google.com/uc?export=view&id=1MCoGP1Nk9ghRwKfmKo9HyZ2Nc8Sards0     " alt="Coffe Dreams Logo">
 </div>
 
 <h1>Coffe Dreams</h1>
@@ -122,7 +112,7 @@ button:hover {
   <textarea id="comentarios" rows="3" placeholder="Ej. Dejar en portería, tocar timbre..."></textarea>
 
   <button type="button" id="agregarPedido">Agregar Pedido</button>
-  <button type="button" id="enviarPedidos">Enviar y Confirmar Pedido</button>
+  <button type="button" id="enviarPedidos">Enviar Pedido</button>
 </form>
 
 <div id="resumen"></div>
@@ -132,7 +122,6 @@ button:hover {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNes97vClzV8lQqXfAynOxHo2nwFYDUXzDmomqvT8u_ACAnBtClKct1C7_u0SNl735bw/exec";
 let pedidosTemp = [];
 
-// 🔹 Establecer fecha mínima
 const hoy = new Date().toISOString().split("T")[0];
 document.getElementById("fechaEntrega").setAttribute("min", hoy);
 
@@ -151,7 +140,7 @@ function actualizarResumen(){
     div.innerHTML = "";
     return;
   }
-  let html = "<h3>Resumen de Pedidos:</h3>";
+  let html = "<h3>Resumen del Pedido:</h3>";
   pedidosTemp.forEach((p,i) => {
     html += `<div class="resumen-item">
       ${i+1}. <b>${p.nombre}</b> - ${p.producto} x ${p.cantidad} → $${p.total}<br>
@@ -190,42 +179,34 @@ document.getElementById("agregarPedido").addEventListener("click", ()=>{
   document.getElementById("comentarios").value = "";
 });
 
-// 🔹 Botón principal para enviar pedidos y abrir WhatsApp
 document.getElementById("enviarPedidos").addEventListener("click", ()=>{
   if(pedidosTemp.length === 0){
     alert("No hay pedidos para enviar");
     return;
   }
 
-  const confirmacion = confirm("¿Desea confirmar el envío del pedido?");
-  if (!confirmacion) return;
+  let confirmacion = confirm("¿Desea confirmar y enviar el pedido?");
+  if(!confirmacion) return;
 
-  // 🔹 Enviar pedidos al Google Script
   Promise.all(pedidosTemp.map(pedido => 
     fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(pedido) })
       .then(res => res.text())
   ))
-  .then(() => {
-    // 🔹 Mensaje automático de WhatsApp con resumen
-    let mensaje = "Hola, me gustaría confirmar el siguiente pedido:%0A%0A";
-    pedidosTemp.forEach((p, i) => {
-      mensaje += `${i+1}. ${p.producto} x${p.cantidad} - $${p.total}%0A`;
-      mensaje += `Cliente: ${p.nombre}%0A`;
-      mensaje += `Dirección: ${p.direccion}%0A`;
-      mensaje += `Entrega: ${p.fechaEntrega}%0A`;
-      mensaje += `Comentarios: ${p.comentarios || "Sin comentarios"}%0A%0A`;
+  .then(responses => {
+    document.getElementById("msg").innerHTML = `✅ Pedido enviado correctamente.`;
+
+    // 🔹 Enviar WhatsApp automáticamente
+    let mensaje = "Hola, me gustaría confirmar mi pedido:%0A%0A";
+    pedidosTemp.forEach((p,i)=>{
+      mensaje += `${i+1}. ${p.producto} x ${p.cantidad} = $${p.total}%0AEntrega: ${p.fechaEntrega}%0A${p.direccion}%0A${p.comentarios || "Sin comentarios"}%0A%0A`;
     });
-    const total = pedidosTemp.reduce((acc,p)=>acc+p.total,0);
-    mensaje += `Total General: $${total}%0A%0AGracias por su pedido ❤️`;
+    const totalGeneral = pedidosTemp.reduce((acc,p)=>acc+p.total,0);
+    mensaje += `Total: $${totalGeneral}`;
 
-    const numero = "528442461162"; // Número de WhatsApp
+    const numero = "528442461162"; // Número de WhatsApp (México)
     const url = `https://wa.me/${numero}?text=${mensaje}`;
-
-    // 🔹 Abrir WhatsApp automáticamente
     window.open(url, "_blank");
 
-    // 🔹 Limpiar formulario
-    document.getElementById("msg").innerHTML = `✅ Pedido enviado correctamente y WhatsApp abierto.`;
     pedidosTemp = [];
     actualizarResumen();
     document.getElementById("pedidoForm").reset();
