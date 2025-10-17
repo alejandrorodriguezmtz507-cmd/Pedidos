@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/>
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,21 +6,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedidos Café</title>
 <style>
-body { font-family: Arial; background: #fff8f0; padding: 20px; }
-h1 { text-align: center; color: #8b2e2e; }
-h2 { text-align: center; color: #8b2e2e; }
-form { max-width: 400px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-label { display:block; margin-top:10px; font-weight:bold; }
-input, select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
-button { background:#8b2e2e; color:white; padding:10px; margin-top:15px; width:100%; border:none; border-radius:5px; cursor:pointer; }
-button:hover { background:#a13c3c; }
-.msg { text-align:center; font-weight:bold; margin-top:20px; font-size:16px; color:#333; }
-#resumen { max-width: 400px; margin: 20px auto; padding: 10px; background: #fff4f0; border-radius: 8px; }
-.resumen-item { border-bottom: 1px solid #ccc; padding:5px 0; }
+body { 
+  font-family: Arial; 
+  background: #fff8f0; 
+  padding: 20px; 
+}
+h1, h2 { 
+  text-align: center; 
+  color: #8b2e2e; 
+}
+form { 
+  max-width: 400px; 
+  margin: 20px auto; 
+  padding: 20px; 
+  background: #fff; 
+  border-radius: 10px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
+}
+label { 
+  display:block; 
+  margin-top:10px; 
+  font-weight:bold; 
+}
+input, select, textarea { 
+  width:100%; 
+  padding:8px; 
+  margin-top:5px; 
+  border-radius:5px; 
+  border:1px solid #ccc; 
+}
+button { 
+  background:#8b2e2e; 
+  color:white; 
+  padding:10px; 
+  margin-top:15px; 
+  width:100%; 
+  border:none; 
+  border-radius:5px; 
+  cursor:pointer; 
+}
+button:hover { 
+  background:#a13c3c; 
+}
+.msg { 
+  text-align:center; 
+  font-weight:bold; 
+  margin-top:20px; 
+  font-size:16px; 
+  color:#333; 
+}
+#resumen { 
+  max-width: 400px; 
+  margin: 20px auto; 
+  padding: 10px; 
+  background: #fff4f0; 
+  border-radius: 8px; 
+}
+.resumen-item { 
+  border-bottom: 1px solid #ccc; 
+  padding:5px 0; 
+}
+.logo-container {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.logo-container img {
+  width: 250px;
+  border-radius: 10px;
+}
+.whatsapp-btn {
+  background-color: #25D366;
+  color: white;
+  font-weight: bold;
+}
+.whatsapp-btn:hover {
+  background-color: #1ebe5b;
+}
 </style>
 </head>
 <body>
-<h1>Cofee Dreams</h1>
+
+<div class="logo-container">
+  <img src="https://i.imgur.com/GgVwTMa.jpeg" alt="Coffe Dreams by Cakes&Cupkakes">
+</div>
+
+<h1>Coffe Dreams</h1>
 <h2>Formulario Solicitud de Producto</h2>
 
 <form id="pedidoForm">
@@ -38,8 +108,7 @@ button:hover { background:#a13c3c; }
     <option value="Café individual">Café individual - $60</option>
     <option value="Café + Pastel">Café + Pastel - $120</option>
     <option value="Pastel">Pastel - $60</option>
-    <option value="Late oreo">Late oreo - $50</option
-    
+    <option value="Late oreo">Late oreo - $50</option>
   </select>
 
   <label>Cantidad</label>
@@ -49,7 +118,7 @@ button:hover { background:#a13c3c; }
   <textarea id="comentarios" rows="3" placeholder="Ej. Dejar en portería, tocar timbre..."></textarea>
 
   <button type="button" id="agregarPedido">Agregar Pedido</button>
-  <button type="button" id="enviarPedidos">Enviar Todos los Pedidos</button>
+  <button type="button" id="enviarPedidos">Enviar y Confirmar Pedido</button>
 </form>
 
 <div id="resumen"></div>
@@ -57,10 +126,9 @@ button:hover { background:#a13c3c; }
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNes97vClzV8lQqXfAynOxHo2nwFYDUXzDmomqvT8u_ACAnBtClKct1C7_u0SNl735bw/exec";
+let pedidosTemp = [];
 
-let pedidosTemp = []; // array temporal de pedidos
-
-// 🔹 Establecer fecha mínima (hoy) en el input
+// 🔹 Establecer fecha mínima
 const hoy = new Date().toISOString().split("T")[0];
 document.getElementById("fechaEntrega").setAttribute("min", hoy);
 
@@ -70,11 +138,9 @@ function calcularTotal(producto, cantidad){
   if(producto === "Café + Pastel") precio = 120;
   if(producto === "Pastel") precio = 60;
   if(producto === "Late oreo") precio = 50;
-  
   return precio * cantidad;
 }
 
-// Función para actualizar el resumen en pantalla
 function actualizarResumen(){
   const div = document.getElementById("resumen");
   if(pedidosTemp.length === 0){
@@ -96,13 +162,11 @@ function actualizarResumen(){
   div.innerHTML = html;
 }
 
-// Eliminar pedido temporal
 function eliminarTemp(index){
   pedidosTemp.splice(index,1);
   actualizarResumen();
 }
 
-// Agregar pedido al resumen temporal
 document.getElementById("agregarPedido").addEventListener("click", ()=>{
   const nombre = document.getElementById("nombre").value.trim();
   const direccion = document.getElementById("direccion").value.trim();
@@ -122,27 +186,50 @@ document.getElementById("agregarPedido").addEventListener("click", ()=>{
   document.getElementById("comentarios").value = "";
 });
 
-// Enviar todos los pedidos
+// 🔹 Botón principal para enviar pedidos y abrir WhatsApp
 document.getElementById("enviarPedidos").addEventListener("click", ()=>{
   if(pedidosTemp.length === 0){
     alert("No hay pedidos para enviar");
     return;
   }
-  // Enviar cada pedido al SCRIPT_URL
+
+  const confirmacion = confirm("¿Desea confirmar el envío del pedido?");
+  if (!confirmacion) return;
+
+  // 🔹 Enviar pedidos al Google Script
   Promise.all(pedidosTemp.map(pedido => 
     fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(pedido) })
       .then(res => res.text())
   ))
-  .then(responses => {
-    document.getElementById("msg").innerHTML = `✅ Se enviaron ${pedidosTemp.length} pedidos correctamente.`;
+  .then(() => {
+    // 🔹 Mensaje automático de WhatsApp con resumen
+    let mensaje = "Hola, me gustaría confirmar el siguiente pedido:%0A%0A";
+    pedidosTemp.forEach((p, i) => {
+      mensaje += `${i+1}. ${p.producto} x${p.cantidad} - $${p.total}%0A`;
+      mensaje += `Cliente: ${p.nombre}%0A`;
+      mensaje += `Dirección: ${p.direccion}%0A`;
+      mensaje += `Entrega: ${p.fechaEntrega}%0A`;
+      mensaje += `Comentarios: ${p.comentarios || "Sin comentarios"}%0A%0A`;
+    });
+    const total = pedidosTemp.reduce((acc,p)=>acc+p.total,0);
+    mensaje += `Total General: $${total}%0A%0AGracias por su pedido ❤️`;
+
+    const numero = "528442461162"; // Número de WhatsApp
+    const url = `https://wa.me/${numero}?text=${mensaje}`;
+
+    // 🔹 Abrir WhatsApp automáticamente
+    window.open(url, "_blank");
+
+    // 🔹 Limpiar formulario
+    document.getElementById("msg").innerHTML = `✅ Pedido enviado correctamente y WhatsApp abierto.`;
     pedidosTemp = [];
     actualizarResumen();
     document.getElementById("pedidoForm").reset();
-    // 🔹 volver a aplicar min después de reset
     document.getElementById("fechaEntrega").setAttribute("min", hoy);
   })
   .catch(err => alert("Error al enviar pedidos: " + err));
 });
 </script>
+
 </body>
 </html>
