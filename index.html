@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,6 +38,8 @@ button:hover { background:#a13c3c; }
     <option value="Café individual">Café individual - $60</option>
     <option value="Café + Pastel">Café + Pastel - $120</option>
     <option value="Pastel">Pastel - $60</option>
+    <option value="Late oreo">Late oreo - $50</option
+    
   </select>
 
   <label>Cantidad</label>
@@ -67,6 +69,8 @@ function calcularTotal(producto, cantidad){
   if(producto === "Café individual") precio = 60;
   if(producto === "Café + Pastel") precio = 120;
   if(producto === "Pastel") precio = 60;
+  if(producto === "Late oreo") precio = 50;
+  
   return precio * cantidad;
 }
 
